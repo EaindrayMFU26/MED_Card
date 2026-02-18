@@ -1,20 +1,64 @@
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { Button, SafeAreaView, StyleSheet, Text } from 'react-native';
+import React from "react";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
-import { MainTabParamList, ROUTES } from '../../../core/navigation/routes';
+import AppText from "../../../components/atoms/AppText";
+import PrimaryButton from "../../../components/atoms/PrimaryButton";
+import { theme } from "../../../core/theme/theme";
+import { MainTabParamList, ROUTES } from "../../../core/navigation/routes";
+import { useMedCardStore } from "../../medcard/store/medCardStore";
 
 type Props = BottomTabScreenProps<MainTabParamList, typeof ROUTES.Home>;
 
 export default function HomeScreen({ navigation }: Props) {
+  const profile = useMedCardStore((state) => state.profile);
+  const checklist = useMedCardStore((state) => state.checklist);
+  const completedCount = checklist.filter((item) => item.checked).length;
+  const totalCount = checklist.length || 1;
+  const progress = Math.min(completedCount / totalCount, 1);
+  const firstName = profile.fullName.trim().split(" ")[0] || "there";
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Button
-        title="Show MedCard"
-        onPress={() =>
-          navigation.navigate(ROUTES.MedCard, { screen: ROUTES.MedCardShow })
-        }
-      />
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.header}>
+          <AppText variant="title">Hi {firstName},</AppText>
+          <AppText variant="body" color={theme.colors.textSecondary}>
+            Keep your medical info ready in seconds.
+          </AppText>
+        </View>
+
+        <PrimaryButton
+          label="Show My MedCard"
+          onPress={() =>
+            navigation.navigate(ROUTES.MedCard, { screen: ROUTES.MedCardShow })
+          }
+          style={styles.primaryButton}
+        />
+
+        <View style={styles.sectionCard}>
+          <View style={styles.progressHeader}>
+            <AppText variant="subtitle">Checklist Progress</AppText>
+            <AppText variant="body" color={theme.colors.textSecondary}>
+              {completedCount}/{totalCount} completed
+            </AppText>
+          </View>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+          </View>
+        </View>
+
+        <Pressable
+          onPress={() =>
+            navigation.navigate(ROUTES.MedCard, { screen: ROUTES.MedCardEdit })
+          }
+          style={styles.linkRow}
+        >
+          <AppText variant="body" color={theme.colors.primary}>
+            Quick edit my card
+          </AppText>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -22,12 +66,42 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.colors.background
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 12,
+  content: {
+    padding: theme.spacing.md,
+    gap: theme.spacing.md
   },
+  header: {
+    gap: theme.spacing.xs
+  },
+  primaryButton: {
+    paddingVertical: theme.spacing.md
+  },
+  sectionCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm
+  },
+  progressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primaryMuted,
+    overflow: "hidden"
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: theme.colors.primary
+  },
+  linkRow: {
+    alignSelf: "flex-start"
+  }
 });
