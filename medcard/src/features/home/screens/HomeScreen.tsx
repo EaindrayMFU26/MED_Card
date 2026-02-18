@@ -69,19 +69,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background
   },
   content: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md
+    padding: 16,
+    gap: 20,
+    paddingTop: theme.spacing.md
   },
   header: {
-    gap: theme.spacing.xs
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.xs
   },
   primaryButton: {
-    paddingVertical: theme.spacing.md
+    paddingVertical: theme.spacing.md + 4
   },
   sectionCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
+    padding: 16,
     borderWidth: 1,
     borderColor: theme.colors.border,
     gap: theme.spacing.sm

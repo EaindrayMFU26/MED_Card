@@ -1,6 +1,6 @@
 import React from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 import AppText from "../../../components/atoms/AppText";
 import Chip from "../../../components/atoms/Chip";
@@ -77,13 +77,23 @@ export default function MedCardShowScreen({ navigation }: Props) {
           phone={emergencyContact?.phone || ""}
         />
 
-        <PrimaryButton label="Call" onPress={() => {}} style={styles.callButton} />
-
-        <PrimaryButton
-          label="Edit MedCard"
-          onPress={() => navigation.navigate(ROUTES.MedCardEdit)}
-          style={styles.secondaryButton}
+        <PrimaryButton 
+          label="Call Emergency Contact" 
+          onPress={() => {}} 
+          style={styles.callButton} 
         />
+
+        <Pressable 
+          onPress={() => navigation.navigate(ROUTES.MedCardEdit)}
+          style={({ pressed }) => [
+            styles.editButton,
+            pressed && styles.editButtonPressed
+          ]}
+        >
+          <AppText variant="subtitle" color={theme.colors.primary}>
+            Edit MedCard
+          </AppText>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -95,8 +105,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background
   },
   content: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md
+    padding: 16,
+    gap: 12
   },
   chipRow: {
     flexDirection: "row",
@@ -107,9 +117,20 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs
   },
   callButton: {
-    paddingVertical: theme.spacing.md
+    backgroundColor: theme.colors.danger,
+    paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.sm
   },
-  secondaryButton: {
-    backgroundColor: theme.colors.accent
+  editButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    alignItems: "center"
+  },
+  editButtonPressed: {
+    opacity: 0.7
   }
 });

@@ -22,7 +22,6 @@ export default function SettingsScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <AppText variant="title">Settings</AppText>
           <AppText variant="body" color={theme.colors.textSecondary}>
             Personalize how your MedCard appears.
           </AppText>
@@ -52,8 +51,6 @@ export default function SettingsScreen({ navigation }: Props) {
             }}
           />
         </InfoSectionCard>
-
-        <PrimaryButton label="Back Home" onPress={() => navigation.navigate(ROUTES.Home)} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -65,8 +62,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background
   },
   content: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md
+    padding: 16,
+    gap: 12
   },
   header: {
     gap: theme.spacing.xs

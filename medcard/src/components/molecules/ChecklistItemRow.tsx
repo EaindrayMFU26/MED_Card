@@ -35,12 +35,12 @@ export default function ChecklistItemRow({
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: theme.spacing.md
   },
   box: {
-    width: 18,
-    height: 18,
+    width: 20,
+    height: 20,
     borderRadius: theme.radius.sm,
     borderWidth: 2,
     borderColor: theme.colors.primary

@@ -24,7 +24,7 @@ export default function MedCardHeader({
         </AppText>
         <Chip label={bloodType} tone="accent" />
       </View>
-      <AppText variant="caption" color={theme.colors.textSecondary}>
+      <AppText variant="body" color={theme.colors.textSecondary}>
         DOB: {dob}
       </AppText>
     </View>
@@ -33,7 +33,8 @@ export default function MedCardHeader({
 
 const styles = StyleSheet.create({
   container: {
-    gap: theme.spacing.xs
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm
   },
   row: {
     flexDirection: "row",
@@ -43,6 +44,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap"
   },
   name: {
-    flexShrink: 1
+    flexShrink: 1,
+    fontSize: 28,
+    lineHeight: 36
   }
 });

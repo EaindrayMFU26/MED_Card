@@ -26,7 +26,6 @@ export default function ChecklistScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <AppText variant="title">Checklist</AppText>
           <AppText variant="body" color={theme.colors.textSecondary}>
             Keep everything ready for your visit.
           </AppText>
@@ -61,8 +60,6 @@ export default function ChecklistScreen({ navigation }: Props) {
             <AppText variant="body">You are all set for your visit.</AppText>
           </InfoSectionCard>
         ) : null}
-
-        <PrimaryButton label="Back Home" onPress={() => navigation.navigate(ROUTES.Home)} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -74,8 +71,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background
   },
   content: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md
+    padding: 16,
+    gap: 12
   },
   header: {
     gap: theme.spacing.xs
@@ -83,7 +80,7 @@ const styles = StyleSheet.create({
   progressCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
+    padding: 16,
     borderWidth: 1,
     borderColor: theme.colors.border,
     gap: theme.spacing.sm

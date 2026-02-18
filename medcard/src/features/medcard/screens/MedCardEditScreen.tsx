@@ -244,11 +244,6 @@ export default function MedCardEditScreen({ navigation }: Props) {
         ) : null}
 
         <PrimaryButton label="Save changes" onPress={handleSave} disabled={!canSave} />
-        <PrimaryButton
-          label="Back to Quick Show"
-          onPress={() => navigation.navigate(ROUTES.MedCardShow)}
-          style={styles.secondaryButton}
-        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -260,8 +255,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background
   },
   content: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md
+    padding: 16,
+    gap: 12
   },
   header: {
     gap: theme.spacing.xs
@@ -273,8 +268,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: theme.spacing.sm
-  },
-  secondaryButton: {
-    backgroundColor: theme.colors.accent
   }
 });
