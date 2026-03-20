@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
@@ -10,106 +10,34 @@ import InfoSectionCard from "../../../components/molecules/InfoSectionCard";
 import { theme } from "../../../core/theme/theme";
 import { MedCardStackParamList, ROUTES } from "../../../core/navigation/routes";
 import { useMedCardStore } from "../store/medCardStore";
+import { useMedCardForm } from "../../hooks/useMedCardForm";
+import { MEDICATIONS_SEPARATOR } from "../../../core/constants/appConstants";
 
 type Props = NativeStackScreenProps<MedCardStackParamList, typeof ROUTES.MedCardEdit>;
 
 export default function MedCardEditScreen({ navigation }: Props) {
   const profile = useMedCardStore((state) => state.profile);
-  const setProfile = useMedCardStore((state) => state.setProfile);
-  const contact = profile.emergencyContacts[0];
-  const [name, setName] = useState(profile.fullName);
-  const [dob, setDob] = useState(profile.dateOfBirth);
-  const [bloodType, setBloodType] = useState(profile.bloodType);
-  const [allergies, setAllergies] = useState<string[]>([...profile.allergies]);
-  const [conditions, setConditions] = useState<string[]>([...profile.conditions]);
-  const [meds, setMeds] = useState(profile.medications.join(", "));
-  const [emergencyName, setEmergencyName] = useState(contact?.name || "");
-  const [emergencyRelation, setEmergencyRelation] = useState(contact?.relation || "");
-  const [emergencyPhone, setEmergencyPhone] = useState(contact?.phone || "");
-  const [notes, setNotes] = useState(profile.notes);
+  const {
+    formData,
+    setFormData,
+    errors,
+    addChip,
+    removeChip,
+    handleSave,
+  } = useMedCardForm(profile);
   const [allergyInput, setAllergyInput] = useState("");
   const [conditionInput, setConditionInput] = useState("");
-  const [errors, setErrors] = useState<{ name?: string; dob?: string; emergency?: string }>(
-    {}
-  );
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    setName(profile.fullName);
-    setDob(profile.dateOfBirth);
-    setBloodType(profile.bloodType);
-    setAllergies([...profile.allergies]);
-    setConditions([...profile.conditions]);
-    setMeds(profile.medications.join(", "));
-    setEmergencyName(contact?.name || "");
-    setEmergencyRelation(contact?.relation || "");
-    setEmergencyPhone(contact?.phone || "");
-    setNotes(profile.notes);
-  }, [profile, contact]);
 
   const canSave = useMemo(
-    () => name.trim().length > 0 && dob.trim().length > 0,
-    [name, dob]
+    () => formData.name.trim().length > 0 && formData.dob.trim().length > 0,
+    [formData.name, formData.dob]
   );
 
-  const addChip = (
-    value: string,
-    items: string[],
-    setItems: (next: string[]) => void,
-    setValue: (next: string) => void
-  ) => {
-    const trimmed = value.trim();
-    if (!trimmed || items.includes(trimmed)) {
-      setValue("");
-      return;
+  const onSavePress = async () => {
+    const success = await handleSave();
+    if (success) {
+      navigation.goBack();
     }
-    setItems([...items, trimmed]);
-    setValue("");
-  };
-
-  const removeChip = (value: string, items: string[], setItems: (next: string[]) => void) => {
-    setItems(items.filter((item) => item !== value));
-  };
-
-  const handleSave = () => {
-    const nextErrors: typeof errors = {};
-    if (!name.trim()) {
-      nextErrors.name = "Name is required";
-    }
-    if (!dob.trim()) {
-      nextErrors.dob = "Date of birth is required";
-    }
-    if (!emergencyName.trim() || !emergencyPhone.trim()) {
-      nextErrors.emergency = "Emergency contact name + phone are required";
-    }
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) {
-      setSaved(false);
-      return;
-    }
-
-    const medicationList = meds
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    setProfile({
-      fullName: name.trim(),
-      dateOfBirth: dob.trim(),
-      bloodType: bloodType.trim(),
-      allergies,
-      conditions,
-      medications: medicationList,
-      emergencyContacts: [
-        {
-          name: emergencyName.trim(),
-          phone: emergencyPhone.trim(),
-          relation: emergencyRelation.trim() || "Contact"
-        }
-      ],
-      notes: notes.trim()
-    });
-    setSaved(true);
   };
 
   return (
@@ -124,19 +52,32 @@ export default function MedCardEditScreen({ navigation }: Props) {
 
         <InfoSectionCard title="Identity">
           <View style={styles.fieldStack}>
-            <InputField label="Full name" value={name} onChangeText={setName} />
+            <InputField
+              label="Full name"
+              value={formData.name}
+              onChangeText={(name) => setFormData({ name })}
+            />
             {errors.name ? (
               <AppText variant="caption" color={theme.colors.danger}>
                 {errors.name}
               </AppText>
             ) : null}
-            <InputField label="Date of birth" value={dob} onChangeText={setDob} />
+            <InputField
+              label="Date of birth (YYYY-MM-DD)"
+              value={formData.dob}
+              onChangeText={(dob) => setFormData({ dob })}
+              placeholder="1990-01-01"
+            />
             {errors.dob ? (
               <AppText variant="caption" color={theme.colors.danger}>
                 {errors.dob}
               </AppText>
             ) : null}
-            <InputField label="Blood type" value={bloodType} onChangeText={setBloodType} />
+            <InputField
+              label="Blood type"
+              value={formData.bloodType}
+              onChangeText={(bloodType) => setFormData({ bloodType })}
+            />
           </View>
         </InfoSectionCard>
 
@@ -149,13 +90,16 @@ export default function MedCardEditScreen({ navigation }: Props) {
             />
             <PrimaryButton
               label="Add allergy"
-              onPress={() => addChip(allergyInput, allergies, setAllergies, setAllergyInput)}
+              onPress={() => {
+                addChip("allergies", allergyInput);
+                setAllergyInput("");
+              }}
             />
             <View style={styles.chipRow}>
-              {allergies.map((item) => (
+              {formData.allergies.map((item, index) => (
                 <Pressable
                   key={item}
-                  onPress={() => removeChip(item, allergies, setAllergies)}
+                  onPress={() => removeChip("allergies", index)}
                 >
                   <Chip label={`${item} x`} />
                 </Pressable>
@@ -176,15 +120,16 @@ export default function MedCardEditScreen({ navigation }: Props) {
             />
             <PrimaryButton
               label="Add condition"
-              onPress={() =>
-                addChip(conditionInput, conditions, setConditions, setConditionInput)
-              }
+              onPress={() => {
+                addChip("conditions", conditionInput);
+                setConditionInput("");
+              }}
             />
             <View style={styles.chipRow}>
-              {conditions.map((item) => (
+              {formData.conditions.map((item, index) => (
                 <Pressable
                   key={item}
-                  onPress={() => removeChip(item, conditions, setConditions)}
+                  onPress={() => removeChip("conditions", index)}
                 >
                   <Chip label={`${item} x`} tone="muted" />
                 </Pressable>
@@ -196,8 +141,15 @@ export default function MedCardEditScreen({ navigation }: Props) {
         <InfoSectionCard title="Medications">
           <InputField
             label="Medications (comma-separated)"
-            value={meds}
-            onChangeText={setMeds}
+            value={formData.medications.join(`${MEDICATIONS_SEPARATOR} `)}
+            onChangeText={(value) =>
+              setFormData({
+                medications: value
+                  .split(MEDICATIONS_SEPARATOR)
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+              })
+            }
             multiline
           />
         </InfoSectionCard>
@@ -206,18 +158,18 @@ export default function MedCardEditScreen({ navigation }: Props) {
           <View style={styles.fieldStack}>
             <InputField
               label="Contact name"
-              value={emergencyName}
-              onChangeText={setEmergencyName}
+              value={formData.emergencyName}
+              onChangeText={(emergencyName) => setFormData({ emergencyName })}
             />
             <InputField
               label="Relationship"
-              value={emergencyRelation}
-              onChangeText={setEmergencyRelation}
+              value={formData.emergencyRelation}
+              onChangeText={(emergencyRelation) => setFormData({ emergencyRelation })}
             />
             <InputField
               label="Phone"
-              value={emergencyPhone}
-              onChangeText={setEmergencyPhone}
+              value={formData.emergencyPhone}
+              onChangeText={(emergencyPhone) => setFormData({ emergencyPhone })}
               keyboardType="phone-pad"
             />
             {errors.emergency ? (
@@ -231,19 +183,19 @@ export default function MedCardEditScreen({ navigation }: Props) {
         <InfoSectionCard title="Notes">
           <InputField
             label="Care notes"
-            value={notes}
-            onChangeText={setNotes}
+            value={formData.notes}
+            onChangeText={(notes) => setFormData({ notes })}
             multiline
           />
         </InfoSectionCard>
 
-        {saved ? (
-          <AppText variant="caption" color={theme.colors.success}>
-            Changes saved locally.
+        {errors.submit ? (
+          <AppText variant="caption" color={theme.colors.danger}>
+            {errors.submit}
           </AppText>
         ) : null}
 
-        <PrimaryButton label="Save changes" onPress={handleSave} disabled={!canSave} />
+        <PrimaryButton label="Save changes" onPress={onSavePress} disabled={!canSave} />
       </ScrollView>
     </SafeAreaView>
   );

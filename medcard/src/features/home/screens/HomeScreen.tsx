@@ -7,15 +7,14 @@ import PrimaryButton from "../../../components/atoms/PrimaryButton";
 import { theme } from "../../../core/theme/theme";
 import { MainTabParamList, ROUTES } from "../../../core/navigation/routes";
 import { useMedCardStore } from "../../medcard/store/medCardStore";
+import { useChecklistProgress } from "../../hooks/useChecklistProgress";
 
 type Props = BottomTabScreenProps<MainTabParamList, typeof ROUTES.Home>;
 
 export default function HomeScreen({ navigation }: Props) {
   const profile = useMedCardStore((state) => state.profile);
   const checklist = useMedCardStore((state) => state.checklist);
-  const completedCount = checklist.filter((item) => item.checked).length;
-  const totalCount = checklist.length || 1;
-  const progress = Math.min(completedCount / totalCount, 1);
+  const { completedCount, totalCount, progress } = useChecklistProgress(checklist);
   const firstName = profile.fullName.trim().split(" ")[0] || "there";
 
   return (

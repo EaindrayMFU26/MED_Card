@@ -1,6 +1,6 @@
 import React from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 import AppText from "../../../components/atoms/AppText";
 import Chip from "../../../components/atoms/Chip";
@@ -11,6 +11,7 @@ import MedCardHeader from "../../../components/molecules/MedCardHeader";
 import { theme } from "../../../core/theme/theme";
 import { MedCardStackParamList, ROUTES } from "../../../core/navigation/routes";
 import { useMedCardStore } from "../store/medCardStore";
+import { callEmergencyContact } from "../../../utils/emergencyContactUtils";
 
 type Props = NativeStackScreenProps<MedCardStackParamList, typeof ROUTES.MedCardShow>;
 
@@ -79,8 +80,15 @@ export default function MedCardShowScreen({ navigation }: Props) {
 
         <PrimaryButton 
           label="Call Emergency Contact" 
-          onPress={() => {}} 
-          style={styles.callButton} 
+          onPress={() => {
+            if (emergencyContact?.phone) {
+              callEmergencyContact(emergencyContact.phone);
+            } else {
+              Alert.alert('No Phone', 'Emergency contact phone number is not set.');
+            }
+          }}
+          disabled={!emergencyContact?.phone}
+          style={[styles.callButton, !emergencyContact?.phone && { opacity: 0.5 }]}
         />
 
         <Pressable 
