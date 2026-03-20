@@ -16,10 +16,12 @@ type ChecklistItem = {
 type MedCardState = {
   profile: MedCardProfile;
   checklist: ChecklistItem[];
+  userConsent: boolean;
   setProfile: (profile: Partial<MedCardProfile>) => void;
   toggleChecklistItem: (id: string) => void;
   resetProfile: () => void;
   resetChecklist: () => void;
+  setUserConsent: (consent: boolean) => void;
 };
 
 const createEmptyProfile = (): MedCardProfile => ({
@@ -63,6 +65,7 @@ export const useMedCardStore = create<MedCardState>()(
     (set) => ({
       profile: createInitialProfile(),
       checklist: createInitialChecklist(),
+      userConsent: false,
       setProfile: (profile) =>
         set((state) => ({
           profile: { ...state.profile, ...profile },
@@ -74,7 +77,8 @@ export const useMedCardStore = create<MedCardState>()(
           )
         })),
       resetProfile: () => set({ profile: createInitialProfile() }),
-      resetChecklist: () => set({ checklist: createInitialChecklist() })
+      resetChecklist: () => set({ checklist: createInitialChecklist() }),
+      setUserConsent: (consent: boolean) => set({ userConsent: consent })
     }),
     {
       name: STORAGE_KEYS.medCardProfile,
